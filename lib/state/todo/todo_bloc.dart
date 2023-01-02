@@ -34,7 +34,6 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
     AddAllItem event,
     Emitter<ToDoState> emit,
   ) {
-    final state = this.state;
     emit(
       state.copyWith(
         todoList: List.from(state.todoList)
@@ -49,7 +48,6 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
     RemoveItem event,
     Emitter<ToDoState> emit,
   ) {
-    final state = this.state;
     emit(
       state.copyWith(
         todoList: List.from(state.todoList)
@@ -64,7 +62,6 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
     UpdateItem event,
     Emitter<ToDoState> emit,
   ) {
-    final state = this.state;
     final index = state.todoList.indexWhere((e) => e.id == event.item.id);
     if (!index.isNegative) {
       state.todoList[index] = event.item;
