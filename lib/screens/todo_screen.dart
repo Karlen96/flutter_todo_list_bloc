@@ -7,7 +7,7 @@ import '../state/todo/todo_events.dart';
 import '../state/todo/todo_state.dart';
 
 class TodoListScreen extends StatefulWidget {
-  const TodoListScreen({Key? key}) : super(key: key);
+  const TodoListScreen({super.key});
 
   @override
   State<TodoListScreen> createState() => _TodoListScreenState();
@@ -29,22 +29,22 @@ class _TodoListScreenState extends State<TodoListScreen> {
   void _openAddModal() {
     showModalBottomSheet<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: _textEditingController,
                 autofocus: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'To do title',
                 ),
               ),
               ElevatedButton(
-                child: const Text('add to do'),
                 onPressed: addItem,
+                child: const Text('add to do'),
               ),
               SizedBox(
                 height: MediaQuery.of(context).viewInsets.bottom,
@@ -80,14 +80,14 @@ class _TodoListScreenState extends State<TodoListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Todo App"),
+        title: const Text('Todo App'),
       ),
       body: BlocBuilder<TodoBloc, ToDoState>(
         builder: (context, state) {
           return ListView.separated(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             itemCount: state.todoList.length,
-            separatorBuilder: (_, i) => Divider(),
+            separatorBuilder: (_, i) => const Divider(),
             itemBuilder: (_, i) => Dismissible(
               key: ValueKey(i),
               confirmDismiss: (_) => _confirmDismiss(
@@ -95,7 +95,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 state.todoList[i].id,
               ),
               child: ListTile(
-                title: Text('${state.todoList[i].title}'),
+                title: Text(state.todoList[i].title),
                 trailing: Checkbox(
                   value: state.todoList[i].isDone,
                   onChanged: (_) => _onChanged(

@@ -1,8 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_todo_list_bloc/entities/todo_entity.dart';
-import 'package:flutter_todo_list_bloc/state/todo/todo_events.dart';
-import 'package:flutter_todo_list_bloc/state/todo/todo_state.dart';
 import 'package:uuid/uuid.dart';
+
+import '../../entities/todo_entity.dart';
+import 'todo_events.dart';
+import 'todo_state.dart';
 
 class TodoBloc extends Bloc<TodoEvent, ToDoState> {
   TodoBloc() : super(const ToDoState()) {
@@ -16,13 +17,12 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
     AddItem event,
     Emitter<ToDoState> emit,
   ) {
-    final state = this.state;
     emit(
-      ToDoState(
+      state.copyWith(
         todoList: List.from(state.todoList)
           ..add(
             TodoEntity(
-              id: Uuid().v4(),
+              id: const Uuid().v4(),
               title: event.title,
             ),
           ),
@@ -36,7 +36,7 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
   ) {
     final state = this.state;
     emit(
-      ToDoState(
+      state.copyWith(
         todoList: List.from(state.todoList)
           ..addAll(
             event.items,
@@ -51,7 +51,7 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
   ) {
     final state = this.state;
     emit(
-      ToDoState(
+      state.copyWith(
         todoList: List.from(state.todoList)
           ..removeWhere(
             (e) => e.id == event.id,
@@ -70,7 +70,7 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
       state.todoList[index] = event.item;
     }
     emit(
-      ToDoState(
+      state.copyWith(
         todoList: List.from(state.todoList),
       ),
     );

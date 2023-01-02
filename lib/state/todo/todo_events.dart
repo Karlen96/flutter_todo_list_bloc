@@ -1,4 +1,4 @@
-import 'package:flutter_todo_list_bloc/entities/todo_entity.dart';
+import '../../entities/todo_entity.dart';
 
 abstract class TodoEvent {}
 

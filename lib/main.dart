@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_todo_list_bloc/sceens/todo_screen.dart';
-import 'package:flutter_todo_list_bloc/state/todo/todo_bloc.dart';
+
+import 'screens/todo_screen.dart';
+import 'state/todo/todo_bloc.dart';
 
 void main() => runApp(
       const MyApp(),
