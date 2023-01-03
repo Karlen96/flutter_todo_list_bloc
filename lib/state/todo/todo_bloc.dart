@@ -6,20 +6,23 @@ import 'todo_events.dart';
 import 'todo_state.dart';
 
 class TodoBloc extends Bloc<TodoEvent, ToDoState> {
-  TodoBloc() : super(const ToDoState()) {
-    on<AddItem>(_addItem);
-    on<AddAllItem>(_addAllItem);
-    on<UpdateItem>(_updateItem);
-    on<RemoveItem>(_removeItem);
+  TodoBloc() : super(ToDoInitialState()) {
+    on<AddItemEvent>(_addItem);
+    on<AddAllItemEvent>(_addAllItem);
+    on<UpdateItemEvent>(_updateItem);
+    on<RemoveItemEvent>(_removeItem);
   }
 
+  final todoList = <TodoEntity>[];
+
   void _addItem(
-    AddItem event,
+    AddItemEvent event,
     Emitter<ToDoState> emit,
   ) {
+    emit(ToDoLoadingState());
     emit(
-      state.copyWith(
-        todoList: List.from(state.todoList)
+      ToDoItemAddedState(
+        newList: todoList
           ..add(
             TodoEntity(
               id: const Uuid().v4(),
@@ -31,13 +34,13 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
   }
 
   void _addAllItem(
-    AddAllItem event,
+    AddAllItemEvent event,
     Emitter<ToDoState> emit,
   ) {
-    final state = this.state;
+    emit(ToDoLoadingState());
     emit(
-      state.copyWith(
-        todoList: List.from(state.todoList)
+      ToDoAllItemAddedState(
+        newList: todoList
           ..addAll(
             event.items,
           ),
@@ -46,13 +49,13 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
   }
 
   void _removeItem(
-    RemoveItem event,
+    RemoveItemEvent event,
     Emitter<ToDoState> emit,
   ) {
-    final state = this.state;
+    emit(ToDoLoadingState());
     emit(
-      state.copyWith(
-        todoList: List.from(state.todoList)
+      ToDoItemUpdatedState(
+        newList: todoList
           ..removeWhere(
             (e) => e.id == event.id,
           ),
@@ -61,18 +64,17 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
   }
 
   void _updateItem(
-    UpdateItem event,
+    UpdateItemEvent event,
     Emitter<ToDoState> emit,
   ) {
     final state = this.state;
-    final index = state.todoList.indexWhere((e) => e.id == event.item.id);
+    final index = todoList.indexWhere((e) => e.id == event.item.id);
     if (!index.isNegative) {
-      state.todoList[index] = event.item;
+      todoList[index] = event.item;
     }
+    emit(ToDoLoadingState());
     emit(
-      state.copyWith(
-        todoList: List.from(state.todoList),
-      ),
+      ToDoItemUpdatedState(newList: todoList),
     );
   }
 }
