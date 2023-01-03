@@ -67,7 +67,6 @@ class TodoBloc extends Bloc<TodoEvent, ToDoState> {
     UpdateItemEvent event,
     Emitter<ToDoState> emit,
   ) {
-    final state = this.state;
     final index = todoList.indexWhere((e) => e.id == event.item.id);
     if (!index.isNegative) {
       todoList[index] = event.item;

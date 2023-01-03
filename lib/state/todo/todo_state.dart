@@ -1,3 +1,5 @@
+import '../../entities/todo_entity.dart';
+
 abstract class ToDoState {}
 
 class ToDoInitialState extends ToDoState {}
@@ -5,7 +7,7 @@ class ToDoInitialState extends ToDoState {}
 class ToDoLoadingState extends ToDoState {}
 
 class ToDoItemAddedState extends ToDoState {
-  final List newList;
+  final List<TodoEntity> newList;
 
   ToDoItemAddedState({
     required this.newList,
@@ -13,7 +15,7 @@ class ToDoItemAddedState extends ToDoState {
 }
 
 class ToDoAllItemAddedState extends ToDoState {
-  final List newList;
+  final List<TodoEntity> newList;
 
   ToDoAllItemAddedState({
     required this.newList,
@@ -21,7 +23,7 @@ class ToDoAllItemAddedState extends ToDoState {
 }
 
 class ToDoItemUpdatedState extends ToDoState {
-  final List newList;
+  final List<TodoEntity> newList;
 
   ToDoItemUpdatedState({
     required this.newList,
@@ -29,7 +31,7 @@ class ToDoItemUpdatedState extends ToDoState {
 }
 
 class ToDoItemRemovedState extends ToDoState {
-  final List newList;
+  final List<TodoEntity> newList;
 
   ToDoItemRemovedState({
     required this.newList,

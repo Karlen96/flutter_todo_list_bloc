@@ -75,39 +75,57 @@ class TodoListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Todo App'),
-      ),
-      body: BlocBuilder<TodoBloc, ToDoState>(
-        builder: (context, state) {
-          return ListView.separated(
-            padding: const EdgeInsets.all(12),
-            itemCount: todoBloc.todoList.length,
-            separatorBuilder: (_, i) => const Divider(),
-            itemBuilder: (_, i) => Dismissible(
-              key: ValueKey(i),
-              confirmDismiss: (_) => _confirmDismiss(
-                _,
-                todoBloc.todoList[i].id,
-              ),
-              child: ListTile(
-                title: Text(todoBloc.todoList[i].title),
-                trailing: Checkbox(
-                  value: todoBloc.todoList[i].isDone,
-                  onChanged: (_) => _onChanged(
-                    _,
-                    todoBloc.todoList[i],
+    return BlocProvider(
+      create: (_) => todoBloc,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Todo App'),
+        ),
+        body: BlocBuilder<TodoBloc, ToDoState>(
+          builder: (context, state) {
+            var todoList = <TodoEntity>[];
+
+            if (state is ToDoItemAddedState) {
+              todoList = state.newList;
+            }
+            if (state is ToDoItemRemovedState) {
+              todoList = state.newList;
+            }
+            if (state is ToDoItemUpdatedState) {
+              todoList = state.newList;
+            }
+            if (state is ToDoAllItemAddedState) {
+              todoList = state.newList;
+            }
+
+            return ListView.separated(
+              padding: const EdgeInsets.all(12),
+              itemCount: todoBloc.todoList.length,
+              separatorBuilder: (_, i) => const Divider(),
+              itemBuilder: (_, i) => Dismissible(
+                key: ValueKey(i),
+                confirmDismiss: (_) => _confirmDismiss(
+                  _,
+                  todoBloc.todoList[i].id,
+                ),
+                child: ListTile(
+                  title: Text(todoList[i].title),
+                  trailing: Checkbox(
+                    value: todoList[i].isDone,
+                    onChanged: (_) => _onChanged(
+                      _,
+                      todoList[i],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openAddModal(context),
-        child: const Icon(Icons.add),
+            );
+          },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _openAddModal(context),
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
