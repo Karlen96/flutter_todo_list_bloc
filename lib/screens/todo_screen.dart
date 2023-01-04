@@ -6,41 +6,45 @@ import '../state/todo/todo_bloc.dart';
 import '../state/todo/todo_events.dart';
 import '../state/todo/todo_state.dart';
 
-class TodoListScreen extends StatelessWidget {
-  final _textEditingController = TextEditingController();
+class TodoListScreen extends StatefulWidget {
+  const TodoListScreen({super.key});
 
-  final TodoBloc todoBloc = TodoBloc();
+  @override
+  State<TodoListScreen> createState() => _TodoListScreenState();
+}
 
-  TodoListScreen({super.key});
-
-  void addItem(BuildContext context) {
-    todoBloc.add(
-      AddItemEvent(
-        title: _textEditingController.text,
-      ),
-    );
-    _textEditingController.clear();
-    Navigator.pop(context);
+class _TodoListScreenState extends State<TodoListScreen> {
+  void addItem(String title) {
+    context.read<TodoBloc>().add(
+          AddItemEvent(title: title),
+        );
   }
 
-  void _openAddModal(BuildContext context) {
-    showModalBottomSheet<void>(
+  Future<void> _openAddModal(BuildContext context) async {
+    final res = await showModalBottomSheet<String?>(
       context: context,
       builder: (context) {
+        var value = '';
+
         return Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: _textEditingController,
                 autofocus: true,
+                onChanged: (val) {
+                  value = val;
+                },
                 decoration: const InputDecoration(
                   labelText: 'To do title',
                 ),
               ),
               ElevatedButton(
-                onPressed: () => addItem(context),
+                onPressed: () => Navigator.pop(
+                  context,
+                  value,
+                ),
                 child: const Text('add to do'),
               ),
               SizedBox(
@@ -51,81 +55,81 @@ class TodoListScreen extends StatelessWidget {
         );
       },
     );
+    if (res != null && res.trim().isNotEmpty) {
+      addItem(res.trim());
+    }
   }
 
   void _onChanged(bool? value, TodoEntity item) {
-    todoBloc.add(
-      UpdateItemEvent(
-        item: item.copyWith(
-          isDone: value ?? false,
-        ),
-      ),
-    );
+    context.read<TodoBloc>().add(
+          UpdateItemEvent(
+            item: item.copyWith(
+              isDone: value ?? false,
+            ),
+          ),
+        );
   }
 
   Future<bool?> _confirmDismiss(
     DismissDirection direction,
     String id,
   ) async {
-    todoBloc.add(
-      RemoveItemEvent(id: id),
-    );
+    context.read<TodoBloc>().add(
+          RemoveItemEvent(id: id),
+        );
     return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => todoBloc,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Todo App'),
-        ),
-        body: BlocBuilder<TodoBloc, ToDoState>(
-          builder: (context, state) {
-            var todoList = <TodoEntity>[];
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Todo App'),
+      ),
+      body: BlocBuilder<TodoBloc, ToDoState>(
+        builder: (context, state) {
+          var todoList = <TodoEntity>[];
 
-            if (state is ToDoItemAddedState) {
-              todoList = state.newList;
-            }
-            if (state is ToDoItemRemovedState) {
-              todoList = state.newList;
-            }
-            if (state is ToDoItemUpdatedState) {
-              todoList = state.newList;
-            }
-            if (state is ToDoAllItemAddedState) {
-              todoList = state.newList;
-            }
+          if (state is ToDoItemAddedState) {
+            todoList = state.newList;
+          }
+          if (state is ToDoItemRemovedState) {
+            todoList = state.newList;
+          }
+          if (state is ToDoItemUpdatedState) {
+            todoList = state.newList;
+          }
+          if (state is ToDoAllItemAddedState) {
+            todoList = state.newList;
+          }
 
-            return ListView.separated(
-              padding: const EdgeInsets.all(12),
-              itemCount: todoBloc.todoList.length,
-              separatorBuilder: (_, i) => const Divider(),
-              itemBuilder: (_, i) => Dismissible(
-                key: ValueKey(i),
-                confirmDismiss: (_) => _confirmDismiss(
-                  _,
-                  todoBloc.todoList[i].id,
-                ),
-                child: ListTile(
-                  title: Text(todoList[i].title),
-                  trailing: Checkbox(
-                    value: todoList[i].isDone,
-                    onChanged: (_) => _onChanged(
-                      _,
-                      todoList[i],
-                    ),
+          return ListView.separated(
+            padding: const EdgeInsets.all(12),
+            itemCount: context.read<TodoBloc>().todoList.length,
+            separatorBuilder: (_, i) => const Divider(),
+            itemBuilder: (_, i) => Dismissible(
+              key: ValueKey(i),
+              confirmDismiss: (_) => _confirmDismiss(
+                _,
+                context.read<TodoBloc>().todoList[i].id,
+              ),
+              child: ListTile(
+                title: Text(todoList[i].title),
+                trailing: Checkbox(
+                  value: todoList[i].isDone,
+                  onChanged: (_) => _onChanged(
+                    _,
+                    todoList[i],
                   ),
                 ),
               ),
-            );
-          },
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _openAddModal(context),
-          child: const Icon(Icons.add),
-        ),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _openAddModal(context),
+        child: const Icon(Icons.add),
       ),
     );
   }

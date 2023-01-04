@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<TodoBloc>(
       create: (_) => TodoBloc(),
-      child: MaterialApp(
+      child: const MaterialApp(
         home: TodoListScreen(),
       ),
     );
