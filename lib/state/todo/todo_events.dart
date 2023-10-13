@@ -1,6 +1,6 @@
 import '../../entities/todo_entity.dart';
 
-abstract class TodoEvent {}
+sealed class TodoEvent {}
 
 /// Notifies bloc to add item.
 class AddItem extends TodoEvent {
@@ -8,15 +8,6 @@ class AddItem extends TodoEvent {
 
   AddItem({
     required this.title,
-  });
-}
-
-/// Notifies bloc to add all items.
-class AddAllItem extends TodoEvent {
-  final List<TodoEntity> items;
-
-  AddAllItem({
-    required this.items,
   });
 }
 
