@@ -1,16 +1,23 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+class TodoEntity {
+  final String id;
+  final String title;
+  final bool isDone;
 
-part 'todo_entity.freezed.dart';
-part 'todo_entity.g.dart';
+  TodoEntity({
+    required this.id,
+    required this.title,
+    this.isDone = false,
+  });
 
-@freezed
-class TodoEntity with _$TodoEntity {
-  const factory TodoEntity({
-    required String id,
-    required String title,
-    @Default(false) bool isDone,
-  }) = _TodoEntity;
-
-  factory TodoEntity.fromJson(Map<String, Object?> json) =>
-      _$TodoEntityFromJson(json);
+  TodoEntity copyWith({
+    String? id,
+    String? title,
+    bool? isDone,
+  }) {
+    return TodoEntity(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      isDone: isDone ?? this.isDone,
+    );
+  }
 }

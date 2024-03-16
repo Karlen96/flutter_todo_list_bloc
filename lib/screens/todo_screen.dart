@@ -5,6 +5,7 @@ import '../entities/todo_entity.dart';
 import '../state/todo/todo_bloc.dart';
 import '../state/todo/todo_events.dart';
 import '../state/todo/todo_state.dart';
+import '../widgets/modals/add_todo_modal.dart';
 
 class TodoListScreen extends StatefulWidget {
   const TodoListScreen({super.key});
@@ -22,38 +23,9 @@ class _TodoListScreenState extends State<TodoListScreen> {
 
   Future<void> _openAddModal(BuildContext context) async {
     final res = await showModalBottomSheet<String?>(
+      isScrollControlled: true,
       context: context,
-      builder: (context) {
-        var value = '';
-
-        return Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                autofocus: true,
-                onChanged: (val) {
-                  value = val;
-                },
-                decoration: const InputDecoration(
-                  labelText: 'To do title',
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(
-                  context,
-                  value,
-                ),
-                child: const Text('add to do'),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).viewInsets.bottom,
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (_) => const AddToDoModal(),
     );
     if (res != null && res.trim().isNotEmpty) {
       addItem(res.trim());
