@@ -1,30 +1,39 @@
 import '../../entities/todo_entity.dart';
 
-sealed class TodoEvent {}
+abstract class TodoEvent {}
 
 /// Notifies bloc to add item.
-class AddItem extends TodoEvent {
+class AddItemEvent extends TodoEvent {
   final String title;
 
-  AddItem({
+  AddItemEvent({
     required this.title,
   });
 }
 
 /// Notifies bloc to add all items.
-class UpdateItem extends TodoEvent {
+class AddAllItemEvent extends TodoEvent {
+  final List<TodoEntity> items;
+
+  AddAllItemEvent({
+    required this.items,
+  });
+}
+
+/// Notifies bloc to add all items.
+class UpdateItemEvent extends TodoEvent {
   final TodoEntity item;
 
-  UpdateItem({
+  UpdateItemEvent({
     required this.item,
   });
 }
 
 /// Notifies bloc to remove item.
-class RemoveItem extends TodoEvent {
+class RemoveItemEvent extends TodoEvent {
   final String id;
 
-  RemoveItem({
+  RemoveItemEvent({
     required this.id,
   });
 }

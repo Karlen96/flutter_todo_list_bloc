@@ -1,19 +1,39 @@
 import '../../entities/todo_entity.dart';
 
-sealed class ToDoBloc {
-  const ToDoBloc();
+abstract class ToDoState {}
+
+class ToDoInitialState extends ToDoState {}
+
+class ToDoLoadingState extends ToDoState {}
+
+class ToDoItemAddedState extends ToDoState {
+  final List<TodoEntity> newList;
+
+  ToDoItemAddedState({
+    required this.newList,
+  }) : super();
 }
 
-final class ToDoBlocInitial extends ToDoBloc {
-  const ToDoBlocInitial({
-    this.todoList = const <TodoEntity>[],
-  });
+class ToDoAllItemAddedState extends ToDoState {
+  final List<TodoEntity> newList;
 
-  final List<TodoEntity> todoList;
+  ToDoAllItemAddedState({
+    required this.newList,
+  }) : super();
 }
 
-final class ToDoBlocLoading extends ToDoBloc {}
+class ToDoItemUpdatedState extends ToDoState {
+  final List<TodoEntity> newList;
 
-final class ToDoBlocFailure extends ToDoBloc {}
+  ToDoItemUpdatedState({
+    required this.newList,
+  }) : super();
+}
 
+class ToDoItemRemovedState extends ToDoState {
+  final List<TodoEntity> newList;
 
+  ToDoItemRemovedState({
+    required this.newList,
+  }) : super();
+}

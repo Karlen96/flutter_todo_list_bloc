@@ -3,33 +3,37 @@ import 'package:flutter/material.dart';
 class AddToDoModal extends StatelessWidget {
   const AddToDoModal({
     super.key,
-    required this.addItem,
-    required this.textEditingController,
   });
-
-  final void Function() addItem;
-  final TextEditingController textEditingController;
 
   @override
   Widget build(BuildContext context) {
+    var value = '';
+
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.only(
+        top: 8,
+        left: 8,
+        right: 8,
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
-            controller: textEditingController,
             autofocus: true,
+            onChanged: (val) {
+              value = val;
+            },
             decoration: const InputDecoration(
               labelText: 'To do title',
             ),
           ),
           ElevatedButton(
-            onPressed: addItem,
-            child: const Text('Add to do'),
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).viewInsets.bottom,
+            onPressed: () => Navigator.pop(
+              context,
+              value,
+            ),
+            child: const Text('add to do'),
           ),
         ],
       ),

@@ -5,61 +5,75 @@ import '../../entities/todo_entity.dart';
 import 'todo_events.dart';
 import 'todo_state.dart';
 
-class TodoBloc extends Bloc<TodoEvent, ToDoBloc> {
-  TodoBloc() : super(const ToDoBlocInitial()) {
-    on<AddItem>(_addItem);
-    on<UpdateItem>(_updateItem);
-    on<RemoveItem>(_removeItem);
+class TodoBloc extends Bloc<TodoEvent, ToDoState> {
+  TodoBloc() : super(ToDoInitialState()) {
+    on<AddItemEvent>(_addItem);
+    on<AddAllItemEvent>(_addAllItem);
+    on<UpdateItemEvent>(_updateItem);
+    on<RemoveItemEvent>(_removeItem);
   }
 
-  void _addItem(
-    AddItem event,
-    Emitter<ToDoBloc> emit,
-  ) {
-    final _toDoList = [
-      ...(state as ToDoBlocInitial).todoList,
-      TodoEntity(
-        id: const Uuid().v4(),
-        title: event.title,
-      ),
-    ];
+  final todoList = <TodoEntity>[];
 
+  void _addItem(
+    AddItemEvent event,
+    Emitter<ToDoState> emit,
+  ) {
+    emit(ToDoLoadingState());
     emit(
-      ToDoBlocInitial(
-        todoList: _toDoList,
+      ToDoItemAddedState(
+        newList: todoList
+          ..add(
+            TodoEntity(
+              id: const Uuid().v4(),
+              title: event.title,
+            ),
+          ),
+      ),
+    );
+  }
+
+  void _addAllItem(
+    AddAllItemEvent event,
+    Emitter<ToDoState> emit,
+  ) {
+    emit(ToDoLoadingState());
+    emit(
+      ToDoAllItemAddedState(
+        newList: todoList
+          ..addAll(
+            event.items,
+          ),
       ),
     );
   }
 
   void _removeItem(
-    RemoveItem event,
-    Emitter<ToDoBloc> emit,
+    RemoveItemEvent event,
+    Emitter<ToDoState> emit,
   ) {
-    final _toDoList = (state as ToDoBlocInitial).todoList
-      ..removeWhere(
-        (e) => e.id == event.id,
-      );
-
+    emit(ToDoLoadingState());
     emit(
-      ToDoBlocInitial(
-        todoList: _toDoList,
+      ToDoItemUpdatedState(
+        newList: todoList
+          ..removeWhere(
+            (e) => e.id == event.id,
+          ),
       ),
     );
   }
 
   void _updateItem(
-    UpdateItem event,
-    Emitter<ToDoBloc> emit,
+    UpdateItemEvent event,
+    Emitter<ToDoState> emit,
   ) {
-    final _todoList = (state as ToDoBlocInitial).todoList;
-    final index = _todoList.indexWhere((e) => e.id == event.item.id);
+    final index = todoList.indexWhere((e) => e.id == event.item.id);
     if (!index.isNegative) {
-      _todoList[index] = event.item;
+      todoList[index] = event.item;
     }
+    emit(ToDoLoadingState());
     emit(
-      ToDoBlocInitial(
-        todoList: _todoList,
-      ),
+      ToDoItemUpdatedState(newList: todoList),
     );
   }
 }

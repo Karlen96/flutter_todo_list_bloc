@@ -15,55 +15,41 @@ class TodoListScreen extends StatefulWidget {
 }
 
 class _TodoListScreenState extends State<TodoListScreen> {
-  final _todoBloc = TodoBloc();
-  final _textEditingController = TextEditingController();
-
-  void addItem() {
-    _todoBloc.add(
-      AddItem(
-        title: _textEditingController.text,
-      ),
-    );
-    _textEditingController.clear();
-    Navigator.pop(context);
+  void addItem(String title) {
+    context.read<TodoBloc>().add(
+          AddItemEvent(title: title),
+        );
   }
 
-  void _openAddModal() {
-    showModalBottomSheet<void>(
+  Future<void> _openAddModal(BuildContext context) async {
+    final res = await showModalBottomSheet<String?>(
+      isScrollControlled: true,
       context: context,
-      builder: (context) {
-        return AddToDoModal(
-          addItem: addItem,
-          textEditingController: _textEditingController,
-        );
-      },
+      builder: (_) => const AddToDoModal(),
     );
+    if (res != null && res.trim().isNotEmpty) {
+      addItem(res.trim());
+    }
   }
 
   void _onChanged(bool? value, TodoEntity item) {
-    _todoBloc.add(
-      UpdateItem(
-        item: item.copyWith(
-          isDone: value ?? false,
-        ),
-      ),
-    );
+    context.read<TodoBloc>().add(
+          UpdateItemEvent(
+            item: item.copyWith(
+              isDone: value ?? false,
+            ),
+          ),
+        );
   }
 
   Future<bool?> _confirmDismiss(
     DismissDirection direction,
     String id,
   ) async {
-    _todoBloc.add(
-      RemoveItem(id: id),
-    );
+    context.read<TodoBloc>().add(
+          RemoveItemEvent(id: id),
+        );
     return true;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _textEditingController.dispose();
   }
 
   @override
@@ -72,43 +58,49 @@ class _TodoListScreenState extends State<TodoListScreen> {
       appBar: AppBar(
         title: const Text('Todo App'),
       ),
-      body: BlocProvider<TodoBloc>(
-        create: (context) => _todoBloc,
-        child: BlocBuilder<TodoBloc, ToDoBloc>(
-          builder: (context, state) {
-            if (state is ToDoBlocInitial) {
-              return ListView.separated(
-                padding: const EdgeInsets.all(12),
-                itemCount: state.todoList.length,
-                separatorBuilder: (_, i) => const Divider(),
-                itemBuilder: (_, i) => Dismissible(
-                  key: ValueKey(i),
-                  confirmDismiss: (_) => _confirmDismiss(
+      body: BlocBuilder<TodoBloc, ToDoState>(
+        builder: (context, state) {
+          var todoList = <TodoEntity>[];
+
+          if (state is ToDoItemAddedState) {
+            todoList = state.newList;
+          }
+          if (state is ToDoItemRemovedState) {
+            todoList = state.newList;
+          }
+          if (state is ToDoItemUpdatedState) {
+            todoList = state.newList;
+          }
+          if (state is ToDoAllItemAddedState) {
+            todoList = state.newList;
+          }
+
+          return ListView.separated(
+            padding: const EdgeInsets.all(12),
+            itemCount: context.read<TodoBloc>().todoList.length,
+            separatorBuilder: (_, i) => const Divider(),
+            itemBuilder: (_, i) => Dismissible(
+              key: ValueKey(i),
+              confirmDismiss: (_) => _confirmDismiss(
+                _,
+                context.read<TodoBloc>().todoList[i].id,
+              ),
+              child: ListTile(
+                title: Text(todoList[i].title),
+                trailing: Checkbox(
+                  value: todoList[i].isDone,
+                  onChanged: (_) => _onChanged(
                     _,
-                    state.todoList[i].id,
-                  ),
-                  child: ListTile(
-                    title: Text(state.todoList[i].title),
-                    trailing: Checkbox(
-                      value: state.todoList[i].isDone,
-                      onChanged: (_) => _onChanged(
-                        _,
-                        state.todoList[i],
-                      ),
-                    ),
+                    todoList[i],
                   ),
                 ),
-              );
-            }
-
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        ),
+              ),
+            ),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _openAddModal,
+        onPressed: () => _openAddModal(context),
         child: const Icon(Icons.add),
       ),
     );
